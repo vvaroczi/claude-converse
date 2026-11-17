@@ -9,7 +9,24 @@ State lives in `~/.claude/converse/` (`on` marker, `config`, `last-spoken`, `ven
 
 ## Commands
 - `/converse setup` (first time): run `bash "<plugin root>/scripts/setup.sh"`; the plugin root is the folder holding this skill's parent `skills/` directory (ask `ls` if unsure). It creates the venv, fetches the model (310 MB) and voices (27 MB) once, writes the default config, and links `~/.claude/converse/bin/converse-say` and `converse-stop`. Reuses an existing HyperFrames Kokoro install if present. Say what it did in one line.
-- `/converse` or `/converse on`: `mkdir -p ~/.claude/converse && touch ~/.claude/converse/on`; if `~/.claude/converse/bin/converse-say` is missing, run setup first. Then answer in conversation style from this reply on. Your first spoken line says you are in conversation mode and that any message cuts you off.
+- `/converse` or `/converse on`: `mkdir -p ~/.claude/converse && touch ~/.claude/converse/on`; if `~/.claude/converse/bin/converse-say` is missing, run setup first. Then answer in conversation style from this reply on. Your first reply in the mode is the welcome: speak (via `converse-say`, then the 🔊 paragraph) something like "Conversation mode on, with <voice name>. Say anything to cut me off. Say faster, slower or quick fire to change pace. Say play the voices to hear the options, or use Emma to switch. Say converse off to end." Under that, write the cheat sheet below once.
+- `/converse help`: write the cheat sheet (no need to speak it all).
+
+## Cheat sheet (write it on welcome and on /converse help)
+| Say or type | What happens |
+|---|---|
+| anything at all, even "stop" | the voice stops at once |
+| "faster", "slower", "quick fire", "take your time", "normal pace" | pace changes: speed and how long the spoken part is |
+| "play the voices" | you hear six voices one after another, each saying its name; then pick |
+| "use Emma" / "use George" / `/converse voice af_heart` | switches the voice |
+| "speed one point two" / `/converse speed 1.2` | sets the speed alone |
+| "longer answers" / "shorter answers" | the spoken part grows or shrinks without changing speed |
+| "read the detail" | the written part of the last reply is read aloud once |
+| "converse off" | mode off, silence, normal written replies |
+
+- "play the voices": audition `af_sky`, `af_heart`, `af_bella`, `bf_emma`, `am_adam`, `bm_george` at the current speed, one short line each that names the voice ("This is Emma."), using the venv python and the model in `~/.claude/converse/models`; then ask which one. Names map to ids: Sky af_sky, Heart af_heart, Bella af_bella, Nicole af_nicole, Emma bf_emma, Isabella bf_isabella, Adam am_adam, Michael am_michael, George bm_george, Lewis bm_lewis.
+- "read the detail": run `converse-say` with the written part of your previous reply, flattened to plain sentences.
+- "longer answers" / "shorter answers": change PACE in the config (quick, normal, slow) without touching SPEED, and say what you set.
 - `/converse off`: `rm -f ~/.claude/converse/on; ~/.claude/converse/bin/converse-stop`; drop the style; confirm in one written line.
 - `/converse voice <name>`: Kokoro voice ids: `af_sky` (default), `af_heart`, `af_bella`, `af_nicole`, `am_adam`, `am_michael`, `am_onyx`, `bf_emma`, `bf_isabella`, `bm_george`, `bm_lewis`, `bm_fable` (more: run the venv python with `Kokoro(model, voices).get_voices()`). Write `KVOICE=<id>` into `~/.claude/converse/config` (keep other keys) and speak one test line. A macOS voice name (Samantha, Karen, Daniel, Moira) sets `ENGINE=say` and `VOICE=<name>`.
 - Pace, by command or by voice ("faster", "slower", "quick fire", "take your time"): write `PACE` and `SPEED`:

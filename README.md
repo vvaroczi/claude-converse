@@ -25,6 +25,16 @@ Then in any Claude Code session:
 
 Until the repository is public, install from this folder: `claude plugin marketplace add /path/to/claude-converse` then the same `install` line.
 
+## Talking to it
+Once the mode is on, these work by voice or typed:
+- anything at all, even "stop": the voice stops at once
+- "faster", "slower", "quick fire", "take your time", "normal pace": pace
+- "play the voices": hear six voices, then "use Emma" (or George, Sky, Heart, Bella, Adam)
+- "longer answers" / "shorter answers": size of the spoken part
+- "read the detail": the written part of the last reply, read once
+- "converse off": back to silent, written replies
+- `/converse help` prints this list; `/converse status` shows the current voice and pace.
+
 ## Requirements
 - macOS (audio through `afplay`; Linux works with `ffplay` or `aplay`, Windows is not wired yet)
 - Python 3.10 or newer
