@@ -30,9 +30,9 @@ State lives in `~/.claude/converse/` (`on` marker, `config`, `last-spoken`, `ven
 - `/converse off`: `rm -f ~/.claude/converse/on; ~/.claude/converse/bin/converse-stop`; drop the style; confirm in one written line.
 - `/converse voice <name>`: Kokoro voice ids: `af_sky` (default), `af_heart`, `af_bella`, `af_nicole`, `am_adam`, `am_michael`, `am_onyx`, `bf_emma`, `bf_isabella`, `bm_george`, `bm_lewis`, `bm_fable` (more: run the venv python with `Kokoro(model, voices).get_voices()`). Write `KVOICE=<id>` into `~/.claude/converse/config` (keep other keys) and speak one test line. A macOS voice name (Samantha, Karen, Daniel, Moira) sets `ENGINE=say` and `VOICE=<name>`.
 - Pace, by command or by voice ("faster", "slower", "quick fire", "take your time"): write `PACE` and `SPEED`:
-  - `quick`: PACE=quick, SPEED=1.45; spoken part one sentence, under 20 words.
-  - `normal`: PACE=normal, SPEED=1.3; one to three sentences, under 60 words.
-  - `slow`: PACE=slow, SPEED=1.0; up to four sentences, room for a reason or a question back.
+  - `quick`: PACE=quick, SPEED=1.2; spoken part one sentence, under 20 words.
+  - `normal`: PACE=normal, SPEED=1.0 (the voice's native pace); one to three sentences, under 60 words.
+  - `slow`: PACE=slow, SPEED=0.85; up to four sentences, room for a reason or a question back.
   - `/converse speed <x>` sets the number alone (0.8 to 1.6).
 - `/converse test`: `~/.claude/converse/bin/converse-say "Conversation mode works."` (needs the `on` marker).
 - `/converse status`: whether `on` exists, the config, whether the venv and model are present.

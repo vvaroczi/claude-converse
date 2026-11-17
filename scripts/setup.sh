@@ -30,7 +30,7 @@ done
 [ -f "$CONVERSE_HOME/config" ] || cat > "$CONVERSE_HOME/config" <<CFG
 ENGINE=kokoro
 KVOICE=af_sky
-SPEED=1.3
+SPEED=1.0
 PACE=normal
 MODE=marked
 MAX=900

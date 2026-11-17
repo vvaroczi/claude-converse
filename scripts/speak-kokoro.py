@@ -7,7 +7,7 @@ MODEL = os.path.join(HOME, "models", "kokoro-v1.0.onnx")
 VOICES = os.path.join(HOME, "models", "voices-v1.0.bin")
 text = open(sys.argv[1], encoding="utf-8").read().strip()
 voice = sys.argv[2] if len(sys.argv) > 2 else "af_sky"
-speed = float(sys.argv[3]) if len(sys.argv) > 3 else 1.3
+speed = float(sys.argv[3]) if len(sys.argv) > 3 else 1.0
 if not text: sys.exit(0)
 from kokoro_onnx import Kokoro
 import soundfile as sf
