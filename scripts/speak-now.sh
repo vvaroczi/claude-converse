@@ -1,17 +1,27 @@
 #!/usr/bin/env bash
-# Speak a text right now. Usage: speak-now.sh "text"  |  speak-now.sh -f file
+# Speak a text right now. Usage: speak-now.sh "text"  |  speak-now.sh -f file  |  speak-now.sh --warm
+# Kokoro speech goes through the voice daemon (model kept loaded), so it starts within a fraction of a second.
 # Records a hash of what was spoken so the Stop hook does not repeat it at the end of the turn.
 set -u
 SELF="$(python3 -c 'import os,sys;print(os.path.realpath(sys.argv[1]))' "$0")"; . "$(dirname "$SELF")/common.sh"
+export CONVERSE_HOME KVOICE SPEED SPEAK_LANG
+if [ "${1:-}" = "--warm" ]; then
+  # Start the daemon in the background and return at once; it is warm a second or two later.
+  [ "$ENGINE" = "kokoro" ] && { nohup python3 "$SCRIPTS_DIR/voice-client.py" start >/dev/null 2>&1 & disown; }
+  exit 0
+fi
 [ -f "$ON_FILE" ] || exit 0
 if [ "${1:-}" = "-f" ]; then TXT="$(cat "$2")"; else TXT="${1:-}"; fi
 TXT="$(printf '%s' "$TXT" | sed -e 's/^[[:space:]]*🔊[[:space:]]*//' | tr -s '[:space:]' ' ')"
 [ -n "$TXT" ] || exit 0
 mkdir -p "$CONVERSE_HOME"
 printf '%s' "$TXT" | shasum -a 256 | cut -c1-16 > "$LAST_FILE"
-bash "$SCRIPTS_DIR/speak-stop.sh"
+# Silence anything not owned by the daemon (old one-shot players, the macOS voice).
+pkill -f "speak-kokoro.py" 2>/dev/null; pkill -x say 2>/dev/null
 case "$ENGINE" in
   kokoro)
+    if printf '%s' "$TXT" | python3 "$SCRIPTS_DIR/voice-client.py" say; then exit 0; fi
+    # Daemon unavailable: one-shot fallback (slower to start).
     TMP="$(mktemp -t converse).txt"; printf '%s\n' "$TXT" > "$TMP"
     ( nohup "$VENV_PY" "$SCRIPTS_DIR/speak-kokoro.py" "$TMP" "$KVOICE" "$SPEED" "$SPEAK_LANG" >/dev/null 2>&1; rm -f "$TMP" ) & disown ;;
   say)

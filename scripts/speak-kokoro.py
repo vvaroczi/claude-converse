@@ -17,7 +17,7 @@ parts = [p.strip() for p in re.split(r"(?<=[.!?])\s+", text) if p.strip()]
 chunks, cur = [], ""
 for p in parts:
     cur = (cur + " " + p).strip()
-    if len(cur) > 220: chunks.append(cur); cur = ""
+    if len(cur) > (220 if chunks else 0): chunks.append(cur); cur = ""  # first chunk = first sentence, so audio starts sooner
 if cur: chunks.append(cur)
 player = ["afplay"] if shutil.which("afplay") else (["ffplay", "-nodisp", "-autoexit", "-loglevel", "quiet"] if shutil.which("ffplay") else (["aplay", "-q"] if shutil.which("aplay") else None))
 if not player: sys.exit(0)

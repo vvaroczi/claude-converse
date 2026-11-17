@@ -56,7 +56,8 @@ English is the default and the best. Native voices also exist for Spanish, Frenc
 ## How it works
 - `hooks/hooks.json` wires two hooks: Stop reads the 🔊 paragraphs of the finished reply; UserPromptSubmit kills any playback.
 - The `converse` skill tells Claude how to answer in the mode: spoken part first, written detail second, and how to trigger speech before the text lands (`~/.claude/converse/bin/converse-say`), with a hash so the end-of-turn hook does not repeat it.
-- `scripts/speak-kokoro.py` synthesizes sentence groups ahead of playback, so there are no gaps.
+- `scripts/voice-daemon.py` keeps Kokoro loaded and warm on a local socket (`~/.claude/converse/voice.sock`), so speech starts under a second after `converse-say`, while the reply is still printing. The first chunk is just the first sentence; later chunks are made while earlier ones play, so there are no gaps. It exits after an hour unused. `scripts/voice-client.py` talks to it and starts it when needed.
+- `scripts/speak-kokoro.py` is the one-shot fallback if the daemon can't start (slower: it loads the model for each reply).
 - State and models live in `~/.claude/converse/`, never inside the plugin, so updates keep your voice and pace.
 
 ## Voices

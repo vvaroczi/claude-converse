@@ -9,7 +9,7 @@ State lives in `~/.claude/converse/` (`on` marker, `config`, `last-spoken`, `ven
 
 ## Commands
 - `/converse setup` (first time): run `bash "<plugin root>/scripts/setup.sh"`; the plugin root is the folder holding this skill's parent `skills/` directory (ask `ls` if unsure). It creates the venv, fetches the model (310 MB) and voices (27 MB) once, writes the default config, and links `~/.claude/converse/bin/converse-say` and `converse-stop`. Reuses an existing HyperFrames Kokoro install if present. Say what it did in one line.
-- `/converse` or `/converse on`: `mkdir -p ~/.claude/converse && touch ~/.claude/converse/on`; if `~/.claude/converse/bin/converse-say` is missing, run setup first. Then answer in conversation style from this reply on. Your first reply in the mode is the welcome: speak (via `converse-say`, then the 🔊 paragraph) something like "Conversation mode on, with <voice name>. Say anything to cut me off. Say faster, slower or quick fire to change pace. Say play the voices to hear the options, or use Emma to switch. Say converse off to end." Under that, write the cheat sheet below once.
+- `/converse` or `/converse on`: `mkdir -p ~/.claude/converse && touch ~/.claude/converse/on && ~/.claude/converse/bin/converse-say --warm`; if `~/.claude/converse/bin/converse-say` is missing, run setup first. Then answer in conversation style from this reply on. Your first reply in the mode is the welcome: speak (via `converse-say`, then the 🔊 paragraph) something like "Conversation mode on, with <voice name>. Say anything to cut me off. Say faster, slower or quick fire to change pace. Say play the voices to hear the options, or use Emma to switch. Say converse off to end." Under that, write the cheat sheet below once.
 - `/converse help`: write the cheat sheet (no need to speak it all).
 
 ## Cheat sheet (write it on welcome and on /converse help)
@@ -27,7 +27,7 @@ State lives in `~/.claude/converse/` (`on` marker, `config`, `last-spoken`, `ven
 - "play the voices": audition `af_sky`, `af_heart`, `af_bella`, `bf_emma`, `am_adam`, `bm_george` at the current speed, one short line each that names the voice ("This is Emma."), using the venv python and the model in `~/.claude/converse/models`; then ask which one. Names map to ids: Sky af_sky, Heart af_heart, Bella af_bella, Nicole af_nicole, Emma bf_emma, Isabella bf_isabella, Adam am_adam, Michael am_michael, George bm_george, Lewis bm_lewis.
 - "read the detail": run `converse-say` with the written part of your previous reply, flattened to plain sentences.
 - "longer answers" / "shorter answers": change PACE in the config (quick, normal, slow) without touching SPEED, and say what you set.
-- `/converse off`: `rm -f ~/.claude/converse/on; ~/.claude/converse/bin/converse-stop`; drop the style; confirm in one written line.
+- `/converse off`: `rm -f ~/.claude/converse/on; ~/.claude/converse/bin/converse-stop --quit`; drop the style; confirm in one written line.
 - `/converse voice <name>`: Kokoro voice ids: `af_sky` (default), `af_heart`, `af_bella`, `af_nicole`, `am_adam`, `am_michael`, `am_onyx`, `bf_emma`, `bf_isabella`, `bm_george`, `bm_lewis`, `bm_fable` (more: run the venv python with `Kokoro(model, voices).get_voices()`). Write `KVOICE=<id>` into `~/.claude/converse/config` (keep other keys) and speak one test line. A macOS voice name (Samantha, Karen, Daniel, Moira) sets `ENGINE=say` and `VOICE=<name>`.
 - Pace, by command or by voice ("faster", "slower", "quick fire", "take your time"): write `PACE` and `SPEED`:
   - `quick`: PACE=quick, SPEED=1.2; spoken part one sentence, under 20 words.
@@ -40,7 +40,10 @@ State lives in `~/.claude/converse/` (`on` marker, `config`, `last-spoken`, `ven
 - Audition voices: synthesize one short line per voice with the venv python and play them one after another; then ask which one.
 
 ## Speaking while the reply prints, and stopping
-- Hooks fire only at the end of a turn. To speak at the same time as the text appears, first make a Bash call `~/.claude/converse/bin/converse-say "<the exact spoken sentences>"` (plain text, no 🔊, escape straight double quotes), then in the next message write the reply whose 🔊 paragraph is those identical sentences. Speech starts about two seconds later while the person reads; the Stop hook recognises the text (hash in `last-spoken`) and stays silent. Do the same for a mid-turn progress line worth hearing.
+- The voice must never start after the paragraph has printed. The Stop hook only fires once the whole turn is over, so it is a late safety net, not the way to speak.
+- **Always speak first.** For every 🔊 paragraph, the Bash call `~/.claude/converse/bin/converse-say "<the exact spoken sentences>"` (plain text, no 🔊, escape straight double quotes) comes BEFORE the text: before any other tool call that would delay it, and in its own message, with the reply written only in the next message. The 🔊 paragraph is then those identical sentences. The voice daemon keeps the model loaded, so speech starts in well under a second, while the text is still appearing. The Stop hook recognises the text (hash in `last-spoken`) and stays silent.
+- A turn with tool work: speak a short opener first ("Let me look at the code."), do the work, then make the converse-say call for the final 🔊 paragraph immediately before writing the final reply. Never write a 🔊 paragraph that was not spoken first.
+- `/converse on` also runs `~/.claude/converse/bin/converse-say --warm` so the first reply is fast too. `/converse off` runs `~/.claude/converse/bin/converse-stop --quit`, which also shuts the daemon down (it exits by itself after an hour unused).
 - Stopping: the UserPromptSubmit hook kills playback the moment the person sends anything. `/converse off` also stops it.
 
 ## How to answer while conversation mode is on
