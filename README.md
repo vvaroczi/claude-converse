@@ -52,6 +52,6 @@ Kokoro ships 50 voices. English ones worth trying: `af_sky` (default), `af_heart
 ## Licences
 Plugin code: MIT. Kokoro-82M weights: Apache-2.0 (hexgrad). kokoro-onnx runtime: MIT (thewh1teagle). Models are downloaded from the kokoro-onnx GitHub release at setup time, not bundled.
 
-## Announcement text (for the team chat)
+## About
 
-Working from home, deep in Claude Code, talking to it all day through dictation, and it never talks back. You read, and read, and read. I built a small plugin that fixes that: conversation mode. Switch it on with /converse and Claude answers out loud with a natural local voice; the spoken part is short, the detail stays written for you to read. It starts speaking while the text is still printing. Say anything and it shuts up instantly. You can change the voice ("use George") and the pace ("faster", "quick fire") by just saying so. Runs entirely on the Mac, no keys, no cloud. Install takes two commands plus a one-time model download. Repo and instructions: <link>.
+Working from home, deep in Claude Code, talking to it all day through dictation, and it never talks back. You read, and read, and read. Conversation mode fixes that. Switch it on with /converse and Claude answers out loud with a natural local voice; the spoken part is short, the detail stays written for you to read. It starts speaking while the text is still printing. Say anything and it stops instantly. Change the voice ("use George") or the pace ("faster", "quick fire") just by saying so. Runs entirely on the Mac, no keys, no cloud. A personal side project, shared in case it helps.
