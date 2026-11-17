@@ -25,15 +25,21 @@ Then in any Claude Code session:
 
 Until the repository is public, install from this folder: `claude plugin marketplace add /path/to/claude-converse` then the same `install` line.
 
-## Talking to it
+## Talking to it (cheat sheet)
 Once the mode is on, these work by voice or typed:
-- anything at all, even "stop": the voice stops at once
-- "faster", "slower", "quick fire", "take your time", "normal pace": pace
-- "play the voices": hear six voices, then "use Emma" (or George, Sky, Heart, Bella, Adam)
-- "longer answers" / "shorter answers": size of the spoken part
-- "read the detail": the written part of the last reply, read once
-- "converse off": back to silent, written replies
-- `/converse help` prints this list; `/converse status` shows the current voice and pace.
+
+| Say or type | What happens |
+|---|---|
+| anything at all, even "stop" | the voice stops at once |
+| "faster", "slower", "quick fire", "take your time", "normal pace" | pace: speed and how long the spoken part is |
+| "play the voices" | six voices, each says its name; then pick |
+| "use Emma", "use George", or `/converse voice af_heart` | switch voice |
+| "speed one point two" or `/converse speed 1.2` | speed alone |
+| "longer answers" / "shorter answers" | spoken part grows or shrinks |
+| "read the detail" | the written part of the last reply, read once |
+| "converse off" | mode off, silent written replies |
+
+`/converse help` prints this list; `/converse status` shows the current voice and pace.
 
 ## Requirements
 - macOS (audio through `afplay`; Linux works with `ffplay` or `aplay`, Windows is not wired yet)
