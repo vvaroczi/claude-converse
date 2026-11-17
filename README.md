@@ -23,7 +23,7 @@ Then in any Claude Code session:
 /converse           # talk
 ```
 
-Until the repository is public, install from this folder: `claude plugin marketplace add /path/to/claude-converse` then the same `install` line.
+From a local checkout instead: `claude plugin marketplace add /path/to/claude-converse` then the same `install` line.
 
 ## Demo
 
