@@ -13,7 +13,7 @@ bash "$SCRIPTS_DIR/speak-stop.sh"
 case "$ENGINE" in
   kokoro)
     TMP="$(mktemp -t converse).txt"; printf '%s\n' "$TXT" > "$TMP"
-    ( nohup "$VENV_PY" "$SCRIPTS_DIR/speak-kokoro.py" "$TMP" "$KVOICE" "$SPEED" >/dev/null 2>&1; rm -f "$TMP" ) & disown ;;
+    ( nohup "$VENV_PY" "$SCRIPTS_DIR/speak-kokoro.py" "$TMP" "$KVOICE" "$SPEED" "$SPEAK_LANG" >/dev/null 2>&1; rm -f "$TMP" ) & disown ;;
   say)
     TMP="$(mktemp -t converse).txt"; printf '%s\n' "$TXT" > "$TMP"
     ( nohup say -v "$VOICE" -r "$RATE" -f "$TMP" >/dev/null 2>&1; rm -f "$TMP" ) & disown ;;

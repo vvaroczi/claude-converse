@@ -31,6 +31,7 @@ done
 ENGINE=kokoro
 KVOICE=af_sky
 SPEED=1.0
+SPEAK_LANG=en-us
 PACE=normal
 MODE=marked
 MAX=900

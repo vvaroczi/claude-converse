@@ -41,6 +41,9 @@ Once the mode is on, these work by voice or typed:
 
 `/converse help` prints this list; `/converse status` shows the current voice and pace.
 
+## Languages
+English is the default and the best. Native voices also exist for Spanish, French, Italian, Portuguese (Brazil), Hindi, Japanese and Mandarin: `/converse language es` (or "speak Spanish") switches both the pronunciation and the voice. Other languages, Czech, Hungarian, German, Polish, Dutch among them, are pronounced by rule through a non-native voice, so they come out with an accent: fine for a quick read, not for comfort.
+
 ## Requirements
 - macOS (audio through `afplay`; Linux works with `ffplay` or `aplay`, Windows is not wired yet)
 - Python 3.10 or newer

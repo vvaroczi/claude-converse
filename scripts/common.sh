@@ -7,7 +7,7 @@ VENV_PY="$CONVERSE_HOME/venv/bin/python"
 MODEL="$CONVERSE_HOME/models/kokoro-v1.0.onnx"
 VOICES="$CONVERSE_HOME/models/voices-v1.0.bin"
 SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ENGINE=kokoro; KVOICE=af_sky; SPEED=1.0; VOICE=Samantha; RATE=185; MODE=marked; MAX=900; PACE=normal
+ENGINE=kokoro; KVOICE=af_sky; SPEED=1.0; SPEAK_LANG=en-us; VOICE=Samantha; RATE=185; MODE=marked; MAX=900; PACE=normal
 [ -f "$CONFIG_FILE" ] && . "$CONFIG_FILE"
 if [ "$ENGINE" = "kokoro" ] && { [ ! -x "$VENV_PY" ] || [ ! -f "$MODEL" ] || [ ! -f "$VOICES" ]; }; then
   if command -v say >/dev/null 2>&1; then ENGINE=say; else ENGINE=none; fi

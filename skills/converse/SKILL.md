@@ -34,6 +34,7 @@ State lives in `~/.claude/converse/` (`on` marker, `config`, `last-spoken`, `ven
   - `normal`: PACE=normal, SPEED=1.0 (the voice's native pace); one to three sentences, under 60 words.
   - `slow`: PACE=slow, SPEED=0.85; up to four sentences, room for a reason or a question back.
   - `/converse speed <x>` sets the number alone (0.8 to 1.6).
+- `/converse language <code>` (also "speak Spanish", "switch to Czech"): write `SPEAK_LANG=<code>` to the config. Codes with native voices, and the voice to switch to unless the person named one: `en-us` (default) or `en-gb` (bm_george, bf_emma); `es` ef_dora / em_alex; `fr-fr` ff_siwis; `it` if_sara / im_nicola; `pt-br` pf_dora / pm_alex; `hi` hf_alpha / hm_omega; `ja` jf_alpha / jm_kumo; `cmn` zf_xiaobei / zm_yunxi. Any other code the phonemizer knows (`cs`, `hu`, `de`, `pl`, `nl`, ...) works with the current voice but sounds accented: say so once. From then on write the 🔊 paragraph in that language.
 - `/converse test`: `~/.claude/converse/bin/converse-say "Conversation mode works."` (needs the `on` marker).
 - `/converse status`: whether `on` exists, the config, whether the venv and model are present.
 - Audition voices: synthesize one short line per voice with the venv python and play them one after another; then ask which one.
