@@ -25,6 +25,10 @@ Then in any Claude Code session:
 
 Until the repository is public, install from this folder: `claude plugin marketplace add /path/to/claude-converse` then the same `install` line.
 
+## Demo
+
+[72-second demo video](demo/converse-demo.mp4): conversation mode on, a reply spoken while it prints, an interrupt, pace and voice changes, Spanish, off.
+
 ## Talking to it (cheat sheet)
 Once the mode is on, these work by voice or typed:
 
