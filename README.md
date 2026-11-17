@@ -53,6 +53,12 @@ English is the default and the best. Native voices also exist for Spanish, Frenc
 - Python 3.10 or newer
 - Claude Code 2.1 or newer (hooks: Stop, UserPromptSubmit)
 
+## Several chats at once
+Run conversation mode in as many Claude Code sessions as you like. They share one voice and take turns: a reply from another chat waits until the current one finishes, and when the voice switches chats it says which one first ("uxsimulatr chat."). A chat's newer reply replaces its own older one, so nothing stale piles up. Typing in a chat stops only that chat; `converse-stop --all` silences everything.
+
+## It knows your name
+On first use it asks what to call you (or say "call me Sam"). Replies stay short and human: it uses your name when it greets you or comes back with news, not in every sentence.
+
 ## How it works
 - `hooks/hooks.json` wires two hooks: Stop reads the 🔊 paragraphs of the finished reply; UserPromptSubmit kills any playback.
 - The `converse` skill tells Claude how to answer in the mode: spoken part first, written detail second, and how to trigger speech before the text lands (`~/.claude/converse/bin/converse-say`), with a hash so the end-of-turn hook does not repeat it.

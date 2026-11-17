@@ -36,7 +36,8 @@ from kokoro_onnx import Kokoro  # noqa: E402
 import soundfile as sf  # noqa: E402
 
 kokoro = Kokoro(MODEL, VOICES)
-PLAYER = (["afplay"] if shutil.which("afplay") else
+PLAYER = (os.environ["CONVERSE_PLAYER"].split() if os.environ.get("CONVERSE_PLAYER") else
+          ["afplay"] if shutil.which("afplay") else
           ["ffplay", "-nodisp", "-autoexit", "-loglevel", "quiet"] if shutil.which("ffplay") else
           ["aplay", "-q"] if shutil.which("aplay") else None)
 TMP = tempfile.mkdtemp(prefix="converse-")
@@ -153,23 +154,149 @@ def speak_job(gen, text, voice, speed, lang):
             pass
 
 
-def handle(req):
-    global generation, last_used
-    cmd = req.get("cmd")
-    last_used = time.time()
-    if cmd == "ping":
-        return "ok"
-    if cmd in ("stop", "say", "quit"):
-        with state_lock:
+# ---- Queue across chats ------------------------------------------------------------------------
+# Every request names its source (the Claude Code session). Replies from different chats wait their
+# turn instead of cutting each other off; a chat's newer reply replaces its own older one (playing or
+# waiting); a stop from a chat clears only that chat. When the voice switches to a different chat
+# within LABEL_WINDOW seconds of the last one, the reply opens with that chat's label.
+LABEL_WINDOW = 900
+
+# ---- A voice per chat --------------------------------------------------------------------------
+# The first chat speaks in the configured voice. A new chat that starts while others have spoken in
+# the last ACTIVE_WINDOW gets the next English voice in POOL that no active chat is using, so you can
+# tell chats apart by ear. "use Emma" in a chat pins that chat's voice. Kept in voices.json.
+VOICE_FILE = os.path.join(HOME, "voices.json")
+ACTIVE_WINDOW = 12 * 3600
+POOL = ["af_sky", "bm_george", "bf_emma", "am_michael", "af_heart", "bm_lewis", "af_bella", "am_adam", "bf_isabella", "af_nicole"]
+NAMES = {"af_sky": "Sky", "af_heart": "Heart", "af_bella": "Bella", "af_nicole": "Nicole", "bf_emma": "Emma",
+         "bf_isabella": "Isabella", "am_adam": "Adam", "am_michael": "Michael", "bm_george": "George", "bm_lewis": "Lewis"}
+try:
+    assigned = {s: v for s, v in json.load(open(VOICE_FILE)).items() if time.time() - v.get("seen", 0) < 7 * 86400}
+except Exception:
+    assigned = {}
+
+
+def save_voices():
+    try:
+        tmp = VOICE_FILE + ".tmp"
+        with open(tmp, "w") as f:
+            json.dump(assigned, f)
+        os.replace(tmp, VOICE_FILE)
+    except OSError:
+        pass
+
+
+def voice_id(name):
+    """Accept a voice id (bf_emma) or its name (Emma)."""
+    name = str(name or "").strip()
+    for vid, n in NAMES.items():
+        if name.lower() in (vid, n.lower()):
+            return vid
+    return name if re.fullmatch(r"[a-z]{2}_[a-z]+", name) else None
+
+
+def voice_for(source, default, lang):
+    """The voice this chat speaks in; assigns one on first use (caller holds state_lock)."""
+    now = time.time()
+    a = assigned.get(source)
+    if a:
+        a["seen"] = now
+        save_voices()
+        return a["voice"]
+    if not lang.startswith("en"):
+        return default  # other languages: use the voice picked for that language
+    in_use = {v["voice"] for s, v in assigned.items() if s != source and now - v.get("seen", 0) < ACTIVE_WINDOW}
+    pick = default if default not in in_use else next((v for v in POOL if v not in in_use), default)
+    assigned[source] = {"voice": pick, "pinned": False, "seen": now}
+    save_voices()
+    return pick
+
+
+pending = []            # jobs waiting: dicts with source, label, text, voice, speed, lang
+current = None          # job playing now
+last_source, last_end = None, 0.0
+wake = threading.Condition(state_lock)
+
+
+def cancel_current():
+    """Stop what is playing now (caller holds state_lock)."""
+    global generation
+    generation += 1
+    kill_player()
+
+
+def worker():
+    global current, generation, last_source, last_end
+    while True:
+        with wake:
+            while not pending:
+                wake.wait()
+            job = pending.pop(0)
             generation += 1
             gen = generation
-            kill_player()
-        if cmd == "say":
-            text = str(req.get("text") or "").strip()
-            if text:
-                threading.Thread(target=speak_job, daemon=True, args=(
-                    gen, text, str(req.get("voice") or "af_sky"),
-                    float(req.get("speed") or 1.0), str(req.get("lang") or "en-us"))).start()
+            current = job
+            prefix = ""
+            if (job["label"] and last_source and last_source != job["source"]
+                    and time.time() - last_end < LABEL_WINDOW):
+                prefix = job["label"].rstrip(".") + ". "
+        if os.environ.get("CONVERSE_DEBUG"):
+            with open(os.path.join(HOME, "voice-debug.log"), "a") as f:
+                f.write(f"{time.time():.2f} play {job['source']} {job['voice']} | {prefix + job['text']}\n")
+        try:
+            speak_job(gen, prefix + job["text"], job["voice"], job["speed"], job["lang"])
+        except Exception:
+            pass
+        with wake:
+            current = None
+            last_source, last_end = job["source"], time.time()
+
+
+def handle(req):
+    global last_used
+    cmd = req.get("cmd")
+    last_used = time.time()
+    source = str(req.get("source") or "default")
+    if cmd == "ping":
+        return "ok"
+    if cmd == "say":
+        text = str(req.get("text") or "").strip()
+        if not text:
+            return "ok"
+        lang = str(req.get("lang") or "en-us")
+        job = {"source": source, "label": str(req.get("label") or "")[:40], "text": text,
+               "speed": float(req.get("speed") or 1.0), "lang": lang}
+        with wake:
+            job["voice"] = voice_for(source, str(req.get("voice") or "af_sky"), lang)
+            pending[:] = [j for j in pending if j["source"] != source]
+            if current and current["source"] == source:
+                cancel_current()
+                pending.insert(0, job)     # same chat: the new reply plays straight away
+            else:
+                pending.append(job)        # another chat is talking: wait for it
+            wake.notify()
+        return "ok"
+    if cmd == "voice":
+        # Which voice this chat speaks in (assigned now if it has none): "ok <id> <Name>".
+        # With "set": pin this chat to that voice.
+        with wake:
+            if req.get("set"):
+                vid = voice_id(req["set"])
+                if not vid:
+                    return "err unknown voice"
+                assigned[source] = {"voice": vid, "pinned": True, "seen": time.time()}
+                save_voices()
+            vid = voice_for(source, str(req.get("voice") or "af_sky"), str(req.get("lang") or "en-us"))
+        return f"ok {vid} {NAMES.get(vid, vid)}"
+    if cmd in ("stop", "quit"):
+        # A stop that names no chat (older hooks, plain `converse-stop`) stops everything.
+        everyone = cmd == "quit" or req.get("all") or not req.get("source")
+        with wake:
+            if everyone:
+                pending.clear()
+            else:
+                pending[:] = [j for j in pending if j["source"] != source]
+            if current and (everyone or current["source"] == source):
+                cancel_current()
         if cmd == "quit":
             threading.Thread(target=shutdown, daemon=True).start()
         return "ok"
@@ -189,7 +316,7 @@ def shutdown():
 def idle_watch():
     while True:
         time.sleep(30)
-        if time.time() - last_used > IDLE and player_proc is None:
+        if time.time() - last_used > IDLE and current is None and not pending:
             shutdown()
 
 
@@ -202,6 +329,7 @@ server.bind(SOCK)
 os.chmod(SOCK, 0o600)
 server.listen(8)
 threading.Thread(target=idle_watch, daemon=True).start()
+threading.Thread(target=worker, daemon=True).start()
 while True:
     conn, _ = server.accept()
     try:
