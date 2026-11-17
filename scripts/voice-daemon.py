@@ -59,26 +59,35 @@ except Exception:
     pass
 
 
+# Chunk sizes, in characters. Kokoro makes speech about 4-5x faster than real time on a Mac, and each
+# chunk is made while the one before it plays, so a chunk must take less time to make than the one
+# before it takes to say. A first chunk of a single word ("Done.") lasts under a second, too short to
+# cover the next one, so it is padded to MIN_FIRST; the second chunk stays small; later ones grow.
+MIN_FIRST = 35
+LIMITS = [110, 90, 160]   # max chars for chunk 1, 2, 3; 220 after that
+
+
 def chunks(text):
-    """First chunk: the first sentence, cut at a comma if long, so audio starts fast.
-    Later chunks grow (about 120, then 220 chars) because they are made while earlier ones play."""
-    sentences = [s.strip() for s in re.split(r"(?<=[.!?…])\s+", text) if s.strip()]
-    if not sentences:
-        return []
-    out = []
-    first = sentences.pop(0)
-    if len(first) > 110:
-        m = re.match(r"(.{25,100}?[,;:—–])\s+(.+)", first)
-        if m:
-            out.append(m.group(1))
-            first = m.group(2)
-    out.append(first)
-    cur, limit = "", 120
-    for s in sentences:
-        cur = (cur + " " + s).strip()
-        if len(cur) >= limit:
+    """Split text into chunks that play back to back with no silence between them."""
+    pieces = []
+    for s in re.split(r"(?<=[.!?…])\s+", text):
+        s = s.strip()
+        if not s:
+            continue
+        if len(s) > 90:  # long sentence: allow breaks at clause boundaries
+            pieces.extend(p for p in re.split(r"(?<=[,;:—–])\s+", s) if p)
+        else:
+            pieces.append(s)
+    out, cur = [], ""
+    for p in pieces:
+        i = len(out)
+        limit = LIMITS[i] if i < len(LIMITS) else 220
+        floor = MIN_FIRST if i == 0 else 0
+        if cur and len(cur) + 1 + len(p) > limit and len(cur) >= floor:
             out.append(cur)
-            cur, limit = "", 220
+            cur = p
+        else:
+            cur = (cur + " " + p).strip()
     if cur:
         out.append(cur)
     return out
