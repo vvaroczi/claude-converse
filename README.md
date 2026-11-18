@@ -41,7 +41,7 @@ Once the mode is on, these work by voice or typed:
 | "speed one point two" or `/converse speed 1.2` | speed alone |
 | "longer answers" / "shorter answers" | spoken part grows or shrinks |
 | "read the detail" | the written part of the last reply, read once |
-| "be my coach", "talk like a butler", `/converse personality noir` | a personality: coach, butler, noir, grandma, pirate, hype, zen; "drop the act" for plain |
+| "be my coach", "talk like a butler", `/converse personality noir` | a personality (coach, butler, noir, grandma, pirate, hype, zen) or a mind (einstein, feynman, musk, jobs, munger, holmes); "drop the act" for plain |
 | "converse off" | mode off, silent written replies |
 
 `/converse help` prints this list; `/converse status` shows the current voice and pace.
@@ -58,6 +58,18 @@ Same facts, different delivery. A personality changes how the spoken paragraph i
 - `zen`, the monk: "The bug was a missing comma. Small things carry the weight."
 
 Each one comes with a matching voice and speed. Adding your own is one table row in `skills/converse/SKILL.md`.
+
+### Minds
+A mind is a personality plus a way of thinking: it reframes your problem the way that person would, asks their question, pushes back where they would. Like having them at the table. "Bring in Einstein", "think like Musk", `/converse personality feynman`.
+
+- `einstein`: thought experiment first, strip it to the simplest form, distrust the shared assumption.
+- `feynman`: explain it to a twelve-year-old or admit you do not understand it; name the one experiment that settles it.
+- `musk` (in the spirit of his public engineering method): first principles, question every requirement, delete the part, then simplify.
+- `jobs` (in the spirit of his public product method): start from the experience, say no, is it insanely great.
+- `munger`: invert, always invert; incentives explain most things.
+- `holmes` (fiction): observe before you theorise, the detail nobody mentioned is the case.
+
+Real people are played in the spirit of their well-known public methods and manner, with no invented quotes. The voices are Kokoro's stock voices, not clones.
 
 ## Languages
 English is the default and the best. Native voices also exist for Spanish, French, Italian, Portuguese (Brazil), Hindi, Japanese and Mandarin: `/converse language es` (or "speak Spanish") switches both the pronunciation and the voice. Other languages, Czech, Hungarian, German, Polish, Dutch among them, are pronounced by rule through a non-native voice, so they come out with an accent: fine for a quick read, not for comfort.

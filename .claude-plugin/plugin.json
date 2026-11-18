@@ -1,6 +1,6 @@
 {
   "name": "converse",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Conversation mode for Claude Code: Claude talks back. /converse switches it on; replies open with a short spoken part read aloud by a local neural voice (Kokoro), long detail stays written, any message you send cuts the voice, and you set the voice and pace by talking.",
   "author": {
     "name": "Viktor Varoczi",
