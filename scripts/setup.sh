@@ -33,6 +33,7 @@ KVOICE=af_sky
 SPEED=1.0
 SPEAK_LANG=en-us
 PACE=normal
+PERSONA=plain
 USER_NAME=
 MODE=marked
 MAX=900

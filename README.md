@@ -41,9 +41,23 @@ Once the mode is on, these work by voice or typed:
 | "speed one point two" or `/converse speed 1.2` | speed alone |
 | "longer answers" / "shorter answers" | spoken part grows or shrinks |
 | "read the detail" | the written part of the last reply, read once |
+| "be my coach", "talk like a butler", `/converse personality noir` | a personality: coach, butler, noir, grandma, pirate, hype, zen; "drop the act" for plain |
 | "converse off" | mode off, silent written replies |
 
 `/converse help` prints this list; `/converse status` shows the current voice and pace.
+
+## Personalities
+Same facts, different delivery. A personality changes how the spoken paragraph is phrased and which voice says it; the written detail stays plain and the numbers never change. Say "be my coach" or `/converse personality coach`, "drop the act" to go back.
+
+- `coach`, the sadistic gym coach: "Three files. That's a warm-up, champ. Tests next. Go. Go. Go."
+- `butler`, the unflappable British butler: "The tests have passed, sir. I took the liberty of fixing the typo they were complaining about."
+- `noir`, the 1940s detective narrator: "The bug had been hiding in the parser all along. They always are."
+- `grandma`, your worried grandmother: "The tests pass, love. Now go and eat something."
+- `pirate`: "Arr, the build be green, me hearty. Three bugs walked the plank."
+- `hype`, the stadium announcer: "Ladies and gentlemen... the tests... have passed!"
+- `zen`, the monk: "The bug was a missing comma. Small things carry the weight."
+
+Each one comes with a matching voice and speed. Adding your own is one table row in `skills/converse/SKILL.md`.
 
 ## Languages
 English is the default and the best. Native voices also exist for Spanish, French, Italian, Portuguese (Brazil), Hindi, Japanese and Mandarin: `/converse language es` (or "speak Spanish") switches both the pronunciation and the voice. Other languages, Czech, Hungarian, German, Polish, Dutch among them, are pronounced by rule through a non-native voice, so they come out with an accent: fine for a quick read, not for comfort.
